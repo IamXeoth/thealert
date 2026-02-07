@@ -1,0 +1,149 @@
+:root{
+  --bg:#0b0c10;
+  --fg:#e8e8ea;
+
+  --ok:   rgba(90, 255, 185, 1);
+  --warn: rgba(255, 210, 105, 1);
+  --crit: rgba(255, 90, 110, 1);
+
+  --bar-w: 10px;
+  --bar-h: 96px;
+
+  --gap-y: 44px;
+
+  --glow-core: 30px;
+  --glow-soft: 80px;
+
+  --all-core: 22px;
+  --all-soft: 60px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+.page{
+  min-height: 100vh;
+  display:grid;
+  place-items:center;
+  padding: 18px;
+  background:
+    radial-gradient(900px 600px at 50% 40%, #141625 0%, var(--bg) 60%, #06070a 100%);
+  overflow:hidden;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.mark{
+  position: relative;
+  width: min(92vw, 740px);
+  height: 220px;
+  display:grid;
+  place-items:center;
+  user-select:none;
+}
+
+/* grupo de barras sempre centralizado */
+.barsWrap{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform: translate(-50%, -50%);
+  display:flex;
+  align-items:center;
+  gap: 28px;
+}
+
+.bar{
+  width: var(--bar-w);
+  height: var(--bar-h);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f3f3f6, #cfd2da);
+  box-shadow: 0 10px 26px rgba(0,0,0,.35);
+  transition: transform 900ms cubic-bezier(.2,.8,.2,1),
+              box-shadow 520ms ease,
+              filter 520ms ease;
+}
+
+/* texto: fica sempre fora do grupo (left calculado no TSX) */
+.wordmark{
+  position:absolute;
+  top:50%;
+  transform: translateY(-50%);
+  font-weight:300;
+  letter-spacing:.28em;
+  font-size: clamp(18px, 4vw, 32px);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(232,232,234,.92);
+  transition: left 900ms cubic-bezier(.2,.8,.2,1);
+  pointer-events:none;
+}
+
+/* ===== STACK ===== */
+.mark.stack .barsWrap{
+  gap: 0;
+  flex-direction: column;
+}
+
+.mark.stack .b1{ transform: translateY(calc(var(--gap-y) * -1)); }
+.mark.stack .b2{ transform: translateY(0); }
+.mark.stack .b3{ transform: translateY(var(--gap-y)); }
+
+/* palavra no centro durante stack */
+.mark.stack .wordmark{
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== LINE ===== */
+.mark.line .barsWrap{
+  flex-direction: row;
+}
+
+/* ===== Glow individual ===== */
+.mark.glow-ok .b1,
+.mark.glow-warn .b2,
+.mark.glow-crit .b3{
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.35),
+    0 0 var(--glow-core) var(--glow),
+    0 0 var(--glow-soft) rgba(255,255,255,.14);
+  filter: saturate(1.45) brightness(1.04);
+}
+.mark.glow-ok   { --glow: var(--ok); }
+.mark.glow-warn { --glow: var(--warn); }
+.mark.glow-crit { --glow: var(--crit); }
+
+/* ===== Glow all tri-color ===== */
+.mark.glow-all .b1{
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.35),
+    0 0 var(--all-core) var(--ok),
+    0 0 var(--all-soft) rgba(90,255,185,.18);
+}
+.mark.glow-all .b2{
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.35),
+    0 0 var(--all-core) var(--warn),
+    0 0 var(--all-soft) rgba(255,210,105,.18);
+}
+.mark.glow-all .b3{
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.35),
+    0 0 var(--all-core) var(--crit),
+    0 0 var(--all-soft) rgba(255,90,110,.18);
+}
+
+/* Mobile refine */
+@media (max-width: 520px){
+  :root{
+    --bar-h: 84px;
+    --gap-y: 36px;
+  }
+  .mark{ height: 190px; }
+  .barsWrap{ gap: 22px; }
+  .wordmark{ letter-spacing: .26em; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bar, .wordmark{ transition:none !important; }
+}
