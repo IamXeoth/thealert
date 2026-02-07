@@ -19,29 +19,46 @@
 }
 
 *{ box-sizing:border-box; }
-html,body{ height:100%; }
 
+html, body{
+  width:100%;
+  height:100%;
+  margin:0;
+  background: var(--bg);
+}
+
+body{
+  overflow:hidden; /* evita scroll fantasma / bordas */
+}
+
+/* Tela REAL 100% (mata “bordas brancas” em qualquer browser) */
 .page{
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
   display:grid;
   place-items:center;
-  padding: 18px;
-  background:
-    radial-gradient(900px 600px at 50% 40%, #141625 0%, var(--bg) 60%, #06070a 100%);
   overflow:hidden;
+
+  background:
+    radial-gradient(900px 600px at 50% 50%, #141625 0%, var(--bg) 60%, #06070a 100%);
+
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
+/* Logo */
 .mark{
   position: relative;
-  width: min(92vw, 740px);
+  width: min(90vw, 640px);
   height: 220px;
   display:grid;
   place-items:center;
   user-select:none;
+
+  /* centralização perceptiva (visual) */
+  transform: translateX(-2%);
 }
 
-/* grupo de barras sempre centralizado */
+/* Grupo de barras sempre centralizado */
 .barsWrap{
   position:absolute;
   left:50%;
@@ -63,7 +80,7 @@ html,body{ height:100%; }
               filter 520ms ease;
 }
 
-/* texto: fica sempre fora do grupo (left calculado no TSX) */
+/* Texto: fica fora do grupo (left calculado no TSX) */
 .wordmark{
   position:absolute;
   top:50%;
@@ -88,7 +105,7 @@ html,body{ height:100%; }
 .mark.stack .b2{ transform: translateY(0); }
 .mark.stack .b3{ transform: translateY(var(--gap-y)); }
 
-/* palavra no centro durante stack */
+/* Palavra no centro durante stack */
 .mark.stack .wordmark{
   left: 50%;
   transform: translate(-50%, -50%);
@@ -109,6 +126,7 @@ html,body{ height:100%; }
     0 0 var(--glow-soft) rgba(255,255,255,.14);
   filter: saturate(1.45) brightness(1.04);
 }
+
 .mark.glow-ok   { --glow: var(--ok); }
 .mark.glow-warn { --glow: var(--warn); }
 .mark.glow-crit { --glow: var(--crit); }
@@ -133,15 +151,26 @@ html,body{ height:100%; }
     0 0 var(--all-soft) rgba(255,90,110,.18);
 }
 
-/* Mobile refine */
+/* Mobile */
 @media (max-width: 520px){
   :root{
     --bar-h: 84px;
     --gap-y: 36px;
   }
-  .mark{ height: 190px; }
-  .barsWrap{ gap: 22px; }
-  .wordmark{ letter-spacing: .26em; }
+
+  .mark{
+    height: 190px;
+    width: min(94vw, 520px);
+    transform: translateX(-1%); /* mobile menos “perceptivo” */
+  }
+
+  .barsWrap{
+    gap: 22px;
+  }
+
+  .wordmark{
+    letter-spacing: .26em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce){
