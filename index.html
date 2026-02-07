@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TheAlert — Minimal Motion (Tri-Color + Breath)</title>
+
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --fg:#e8e8ea;
+
+      /* cores vivas, elegantes */
+      --ok:   rgba(90, 255, 185, 1);
+      --warn: rgba(255, 210, 105, 1);
+      --crit: rgba(255, 90, 110, 1);
+
+      --gap: 48px;
+      --text-gap: 48px;
+
+      --bar-w: 10px;
+      --bar-h: 100px;
+
+      /* glow normal */
+      --glow-core: 32px;
+      --glow-soft: 86px;
+
+      /* glow final (sutil) */
+      --all-core: 22px;
+      --all-soft: 60px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(1000px 700px at 50% 38%, #141625 0%, var(--bg) 58%, #06070a 100%);
+      color:var(--fg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .mark{
+      position:relative;
+      width:min(760px, 92vw);
+      height:260px;
+      display:grid;
+      place-items:center;
+      user-select:none;
+    }
+
+    .bar{
+      position:absolute;
+      width:var(--bar-w);
+      height:var(--bar-h);
+      border-radius:999px;
+      background: linear-gradient(180deg, #f3f3f6, #cfd2da);
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      transform: translate(var(--x, 0px), var(--y, 0px));
+      transition:
+        transform 900ms cubic-bezier(.2,.8,.2,1),
+        box-shadow 520ms ease,
+        filter 520ms ease;
+    }
+
+    .wordmark{
+      position:absolute;
+      font-weight:300;
+      letter-spacing:.28em;
+      font-size: clamp(22px, 3.2vw, 34px);
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: rgba(232,232,234,.92);
+      transform: translate(var(--tx, 0px), var(--ty, 0px));
+      transition: transform 900ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    /* Stack */
+    .mark.stack .bar:nth-child(1){ --x:-160px; --y: calc(var(--gap) * -1); }
+    .mark.stack .bar:nth-child(2){ --x:-160px; --y: 0px; }
+    .mark.stack .bar:nth-child(3){ --x:-160px; --y: var(--gap); }
+    .mark.stack .wordmark{ --tx: 0px; --ty: 0px; }
+
+    /* Line */
+    .mark.line .bar:nth-child(1){ --x:-220px; --y:0px; }
+    .mark.line .bar:nth-child(2){ --x:-180px; --y:0px; }
+    .mark.line .bar:nth-child(3){ --x:-140px; --y:0px; }
+    .mark.line .wordmark{ --tx: var(--text-gap); --ty: 0px; }
+
+    /* Glow individual */
+    .mark.glow-ok   .bar:nth-child(1),
+    .mark.glow-warn .bar:nth-child(2),
+    .mark.glow-crit .bar:nth-child(3){
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        0 0 var(--glow-core) var(--glow),
+        0 0 var(--glow-soft) rgba(255,255,255,.14);
+      filter: saturate(1.5) brightness(1.04);
+    }
+
+    .mark.glow-ok   { --glow: var(--ok); }
+    .mark.glow-warn { --glow: var(--warn); }
+    .mark.glow-crit { --glow: var(--crit); }
+
+    /* Glow final: tri-color simultâneo */
+    .mark.glow-all .bar:nth-child(1){
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        0 0 var(--all-core) var(--ok),
+        0 0 var(--all-soft) rgba(90,255,185,.18);
+      filter: saturate(1.45) brightness(1.05);
+    }
+    .mark.glow-all .bar:nth-child(2){
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        0 0 var(--all-core) var(--warn),
+        0 0 var(--all-soft) rgba(255,210,105,.18);
+      filter: saturate(1.45) brightness(1.05);
+    }
+    .mark.glow-all .bar:nth-child(3){
+      box-shadow:
+        0 10px 28px rgba(0,0,0,.35),
+        0 0 var(--all-core) var(--crit),
+        0 0 var(--all-soft) rgba(255,90,110,.18);
+      filter: saturate(1.45) brightness(1.05);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .bar, .wordmark{ transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="mark stack" id="mark" aria-label="TheAlert logo motion">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="wordmark">THE&nbsp;ALERT</div>
+  </div>
+
+  <script>
+    const mark = document.getElementById("mark");
+
+    const sequence = ["glow-ok", "glow-warn", "glow-crit"];
+    const stepMs = 1050; // duração de cada estado
+    const allMs  = 380;  // tricolor
+    const idleMs = 620;  // respiro neutro antes de voltar ao verde
+
+    let idx = 0;
+
+    // stack -> line
+    setTimeout(() => {
+      mark.classList.remove("stack");
+      mark.classList.add("line");
+    }, 700);
+
+    function cycle(){
+      mark.classList.add(sequence[idx]);
+
+      setTimeout(() => {
+        mark.classList.remove(sequence[idx]);
+
+        if (idx === sequence.length - 1) {
+          // tricolor
+          mark.classList.add("glow-all");
+
+          setTimeout(() => {
+            mark.classList.remove("glow-all");
+
+            // respiro neutro
+            setTimeout(() => {
+              idx = 0;
+              cycle();
+            }, idleMs);
+
+          }, allMs);
+        } else {
+          idx++;
+          cycle();
+        }
+      }, stepMs);
+    }
+
+    // inicia após transição
+    setTimeout(cycle, 1700);
+  </script>
+</body>
+</html>
