@@ -1,37 +1,11 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type GlowState = "glow-ok" | "glow-warn" | "glow-crit" | "glow-all" | "none";
 type LayoutState = "stack" | "line";
 
 export default function App() {
-  const barsWrapRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState<LayoutState>("stack");
   const [glow, setGlow] = useState<GlowState>("none");
-  const [barsWidth, setBarsWidth] = useState<number>(0);
-
-  // Mede a largura real do grupo (garante responsividade perfeita)
-  useLayoutEffect(() => {
-    const el = barsWrapRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const rect = el.getBoundingClientRect();
-      setBarsWidth(rect.width);
-    };
-
-    update();
-
-    // ResizeObserver é suportado nos iOS atuais.
-    // (Se quiser fallback depois, eu te mando.)
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-
-    window.addEventListener("resize", update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", update);
-    };
-  }, []);
 
   // Animação: stack → line → ok → warn → crit → tri-color → respiro → ok
   useEffect(() => {
@@ -82,19 +56,16 @@ export default function App() {
     };
   }, []);
 
-  const gapPx = 22; // distância barras → texto
-  const wordmarkLeft = `calc(50% + ${Math.round(barsWidth / 2)}px + ${gapPx}px)`;
-
   return (
     <div className="page">
       <div className={`mark ${layout} ${glow}`} aria-label="TheAlert logo">
-        <div className="barsWrap" ref={barsWrapRef} aria-hidden="true">
+        <div className="barsWrap" aria-hidden="true">
           <div className="bar b1" />
           <div className="bar b2" />
           <div className="bar b3" />
         </div>
 
-        <div className="wordmark" style={{ left: wordmarkLeft }}>
+        <div className="wordmark">
           THE&nbsp;ALERT
         </div>
       </div>
