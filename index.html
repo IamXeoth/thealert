@@ -11,7 +11,6 @@
       --bg:#0b0c10;
       --fg:#e8e8ea;
 
-      /* cores (vivas, minimal) */
       --ok:   rgba(90, 255, 185, 1);
       --warn: rgba(255, 210, 105, 1);
       --crit: rgba(255, 90, 110, 1);
@@ -47,9 +46,9 @@
 
     .mark{
       position:relative;
-      width: 100%;
-      max-width: 640px;
-      height: 220px;
+      width:100%;
+      max-width:640px;
+      height:220px;
       display:grid;
       place-items:center;
       user-select:none;
@@ -81,6 +80,8 @@
       transition: transform 900ms cubic-bezier(.2,.8,.2,1);
     }
 
+    /* ===== DESKTOP ===== */
+
     /* Stack */
     .mark.stack .bar:nth-child(1){ --x:-140px; --y: calc(var(--gap) * -1); }
     .mark.stack .bar:nth-child(2){ --x:-140px; --y: 0px; }
@@ -108,7 +109,7 @@
     .mark.glow-warn { --glow: var(--warn); }
     .mark.glow-crit { --glow: var(--crit); }
 
-    /* Glow final: tricolor */
+    /* Glow final tricolor */
     .mark.glow-all .bar:nth-child(1){
       box-shadow:
         0 10px 26px rgba(0,0,0,.35),
@@ -128,16 +129,29 @@
         0 0 var(--all-soft) rgba(255,90,110,.18);
     }
 
-    /* Mobile fine-tuning */
+    /* ===== MOBILE ===== */
     @media (max-width: 520px){
-      .mark{
-        height: 190px;
-      }
       :root{
         --bar-h: 84px;
-        --gap: 38px;
-        --text-gap: 36px;
+        --gap: 36px;
+        --text-gap: 34px;
       }
+
+      .mark{
+        height:190px;
+        max-width: 100%;
+      }
+
+      /* centraliza tudo no mobile */
+      .mark.stack .bar:nth-child(1){ --x:0px; --y: calc(var(--gap) * -1); }
+      .mark.stack .bar:nth-child(2){ --x:0px; --y: 0px; }
+      .mark.stack .bar:nth-child(3){ --x:0px; --y: var(--gap); }
+      .mark.stack .wordmark{ --tx: 0px; }
+
+      .mark.line .bar:nth-child(1){ --x:-48px; }
+      .mark.line .bar:nth-child(2){ --x:-16px; }
+      .mark.line .bar:nth-child(3){ --x: 16px; }
+      .mark.line .wordmark{ --tx: 52px; }
     }
 
     @media (prefers-reduced-motion: reduce){
