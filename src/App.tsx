@@ -9,7 +9,7 @@ export default function App() {
   const [glow, setGlow] = useState<GlowState>("none");
   const [barsWidth, setBarsWidth] = useState<number>(0);
 
-  // mede a largura real do grupo de barras (responsivo real)
+  // Mede a largura real do grupo (garante responsividade perfeita)
   useLayoutEffect(() => {
     const el = barsWrapRef.current;
     if (!el) return;
@@ -20,6 +20,9 @@ export default function App() {
     };
 
     update();
+
+    // ResizeObserver é suportado nos iOS atuais.
+    // (Se quiser fallback depois, eu te mando.)
     const ro = new ResizeObserver(update);
     ro.observe(el);
 
@@ -30,7 +33,7 @@ export default function App() {
     };
   }, []);
 
-  // animação: stack -> line -> ok -> warn -> crit -> tri-color -> respiro -> ok
+  // Animação: stack → line → ok → warn → crit → tri-color → respiro → ok
   useEffect(() => {
     const stepMs = 1050;
     const allMs = 380;
@@ -79,8 +82,7 @@ export default function App() {
     };
   }, []);
 
-  // gap entre o grupo e o texto (responsivo)
-  const gapPx = 22;
+  const gapPx = 22; // distância barras → texto
   const wordmarkLeft = `calc(50% + ${Math.round(barsWidth / 2)}px + ${gapPx}px)`;
 
   return (
