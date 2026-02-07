@@ -10,63 +10,72 @@
   --bar-h: 96px;
 
   --gap-y: 44px;
+  --gap-x: 28px;
 
   --glow-core: 30px;
   --glow-soft: 80px;
 
   --all-core: 22px;
   --all-soft: 60px;
+
+  --wordmark-gap: 24px;
 }
 
-*{ box-sizing:border-box; }
+*{ 
+  box-sizing:border-box; 
+  margin: 0;
+  padding: 0;
+}
 
 html, body{
   width:100%;
   height:100%;
   margin:0;
+  padding: 0;
   background: var(--bg);
 }
 
 body{
-  overflow:hidden; /* evita scroll fantasma / bordas */
+  overflow:hidden;
 }
 
-/* Tela REAL 100% (mata “bordas brancas” em qualquer browser) */
+/* Container REAL 100vh/vw sem bordas */
 .page{
   position: fixed;
   inset: 0;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items: center;
+  justify-content: center;
   overflow:hidden;
 
   background:
     radial-gradient(900px 600px at 50% 50%, #141625 0%, var(--bg) 60%, #06070a 100%);
 
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  
+  /* Força altura mínima real no mobile */
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* Logo */
+/* Logo wrapper - usa flexbox para centralizar perfeitamente */
 .mark{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wordmark-gap);
+  user-select: none;
+  padding: 20px;
   position: relative;
-  width: min(90vw, 640px);
-  height: 220px;
-  display:grid;
-  place-items:center;
-  user-select:none;
-
-  /* centralização perceptiva (visual) */
-  transform: translateX(-2%);
 }
 
-/* Grupo de barras sempre centralizado */
+/* Grupo de barras */
 .barsWrap{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform: translate(-50%, -50%);
-  display:flex;
-  align-items:center;
-  gap: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-x);
+  flex-shrink: 0;
 }
 
 .bar{
@@ -80,22 +89,25 @@ body{
               filter 520ms ease;
 }
 
-/* Texto: fica fora do grupo (left calculado no TSX) */
+/* Texto */
 .wordmark{
-  position:absolute;
-  top:50%;
-  transform: translateY(-50%);
-  font-weight:300;
-  letter-spacing:.28em;
+  font-weight: 300;
+  letter-spacing: .28em;
   font-size: clamp(18px, 4vw, 32px);
   text-transform: uppercase;
   white-space: nowrap;
   color: rgba(232,232,234,.92);
-  transition: left 900ms cubic-bezier(.2,.8,.2,1);
-  pointer-events:none;
+  transition: opacity 900ms cubic-bezier(.2,.8,.2,1),
+              transform 900ms cubic-bezier(.2,.8,.2,1);
+  flex-shrink: 0;
 }
 
-/* ===== STACK ===== */
+/* ===== STACK MODE ===== */
+.mark.stack{
+  flex-direction: column;
+  gap: 0;
+}
+
 .mark.stack .barsWrap{
   gap: 0;
   flex-direction: column;
@@ -105,15 +117,25 @@ body{
 .mark.stack .b2{ transform: translateY(0); }
 .mark.stack .b3{ transform: translateY(var(--gap-y)); }
 
-/* Palavra no centro durante stack */
+/* Texto opaco durante stack */
 .mark.stack .wordmark{
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.95);
 }
 
-/* ===== LINE ===== */
+/* ===== LINE MODE ===== */
+.mark.line{
+  flex-direction: row;
+}
+
 .mark.line .barsWrap{
   flex-direction: row;
+}
+
+.mark.line .wordmark{
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* ===== Glow individual ===== */
@@ -137,42 +159,96 @@ body{
     0 10px 26px rgba(0,0,0,.35),
     0 0 var(--all-core) var(--ok),
     0 0 var(--all-soft) rgba(90,255,185,.18);
+  filter: saturate(1.45) brightness(1.04);
 }
 .mark.glow-all .b2{
   box-shadow:
     0 10px 26px rgba(0,0,0,.35),
     0 0 var(--all-core) var(--warn),
     0 0 var(--all-soft) rgba(255,210,105,.18);
+  filter: saturate(1.45) brightness(1.04);
 }
 .mark.glow-all .b3{
   box-shadow:
     0 10px 26px rgba(0,0,0,.35),
     0 0 var(--all-core) var(--crit),
     0 0 var(--all-soft) rgba(255,90,110,.18);
+  filter: saturate(1.45) brightness(1.04);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+/* Tablets */
+@media (max-width: 768px){
+  :root{
+    --bar-h: 88px;
+    --gap-y: 40px;
+    --gap-x: 24px;
+    --wordmark-gap: 20px;
+  }
+
+  .wordmark{
+    font-size: clamp(16px, 3.8vw, 28px);
+    letter-spacing: .26em;
+  }
 }
 
 /* Mobile */
 @media (max-width: 520px){
   :root{
-    --bar-h: 84px;
+    --bar-h: 80px;
     --gap-y: 36px;
+    --gap-x: 20px;
+    --wordmark-gap: 16px;
   }
 
   .mark{
-    height: 190px;
-    width: min(94vw, 520px);
-    transform: translateX(-1%); /* mobile menos “perceptivo” */
-  }
-
-  .barsWrap{
-    gap: 22px;
+    padding: 16px;
   }
 
   .wordmark{
-    letter-spacing: .26em;
+    font-size: clamp(14px, 4.2vw, 24px);
+    letter-spacing: .24em;
   }
 }
 
+/* Mobile pequeno */
+@media (max-width: 380px){
+  :root{
+    --bar-h: 72px;
+    --gap-y: 32px;
+    --gap-x: 18px;
+    --wordmark-gap: 14px;
+  }
+
+  .wordmark{
+    font-size: clamp(13px, 4.5vw, 20px);
+    letter-spacing: .22em;
+  }
+}
+
+/* Landscape mobile */
+@media (max-height: 500px) and (orientation: landscape){
+  :root{
+    --bar-h: 64px;
+    --gap-y: 28px;
+  }
+
+  .wordmark{
+    font-size: clamp(12px, 3vw, 20px);
+  }
+}
+
+/* Acessibilidade */
 @media (prefers-reduced-motion: reduce){
-  .bar, .wordmark{ transition:none !important; }
+  .bar, .wordmark{ 
+    transition: none !important; 
+  }
+}
+
+/* Dark mode support (caso navegador force) */
+@media (prefers-color-scheme: light){
+  :root{
+    --bg: #0b0c10;
+  }
 }
