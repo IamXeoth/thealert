@@ -40,9 +40,8 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--fg);
       overflow:hidden;
+      padding: 16px; /* garante respiro nas bordas */
     }
-
-    /* ===== LOGO ===== */
 
     .mark{
       position:relative;
@@ -52,6 +51,7 @@
       display:grid;
       place-items:center;
       user-select:none;
+      padding-inline: 18px; /* evita corte e ajuda no mobile */
     }
 
     .bar{
@@ -78,17 +78,16 @@
       color: rgba(232,232,234,.92);
       transform: translate(var(--tx, 0px), var(--ty, 0px));
       transition: transform 900ms cubic-bezier(.2,.8,.2,1);
+      pointer-events:none;
     }
 
-    /* ===== DESKTOP ===== */
+    /* ===== DESKTOP (inalterado) ===== */
 
-    /* Stack */
     .mark.stack .bar:nth-child(1){ --x:-140px; --y: calc(var(--gap) * -1); }
     .mark.stack .bar:nth-child(2){ --x:-140px; --y: 0px; }
     .mark.stack .bar:nth-child(3){ --x:-140px; --y: var(--gap); }
     .mark.stack .wordmark{ --tx: 0px; }
 
-    /* Line */
     .mark.line .bar:nth-child(1){ --x:-190px; --y:0px; }
     .mark.line .bar:nth-child(2){ --x:-150px; --y:0px; }
     .mark.line .bar:nth-child(3){ --x:-110px; --y:0px; }
@@ -104,7 +103,6 @@
         0 0 var(--glow-soft) rgba(255,255,255,.14);
       filter: saturate(1.45) brightness(1.04);
     }
-
     .mark.glow-ok   { --glow: var(--ok); }
     .mark.glow-warn { --glow: var(--warn); }
     .mark.glow-crit { --glow: var(--crit); }
@@ -129,29 +127,36 @@
         0 0 var(--all-soft) rgba(255,90,110,.18);
     }
 
-    /* ===== MOBILE ===== */
+    /* ===== MOBILE (corrige sobreposição) ===== */
     @media (max-width: 520px){
       :root{
         --bar-h: 84px;
         --gap: 36px;
-        --text-gap: 34px;
       }
 
       .mark{
         height:190px;
         max-width: 100%;
+        padding-inline: 10px;
       }
 
-      /* centraliza tudo no mobile */
+      /* Stack central */
       .mark.stack .bar:nth-child(1){ --x:0px; --y: calc(var(--gap) * -1); }
       .mark.stack .bar:nth-child(2){ --x:0px; --y: 0px; }
       .mark.stack .bar:nth-child(3){ --x:0px; --y: var(--gap); }
       .mark.stack .wordmark{ --tx: 0px; }
 
-      .mark.line .bar:nth-child(1){ --x:-48px; }
-      .mark.line .bar:nth-child(2){ --x:-16px; }
-      .mark.line .bar:nth-child(3){ --x: 16px; }
-      .mark.line .wordmark{ --tx: 52px; }
+      /* Line central, com espaço REAL garantido pro texto */
+      .mark.line .bar:nth-child(1){ --x:-54px; }
+      .mark.line .bar:nth-child(2){ --x:-18px; }
+      .mark.line .bar:nth-child(3){ --x: 18px; }
+
+      /* 👇 em vez de depender só do translate, define “ponto de ancoragem” */
+      .mark.line .wordmark{
+        left: 50%;
+        transform: translate(calc(18px + 46px), 0); /* 18px (centro) + 46px (gap) */
+        /* alternativa simples: transform: translate(64px, 0); */
+      }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -166,7 +171,7 @@
     <div class="bar"></div>
     <div class="bar"></div>
     <div class="bar"></div>
-    <div class="wordmark">THE&nbsp;ALERT</div>
+    <div class="wordmark" id="wm">THE&nbsp;ALERT</div>
   </div>
 
   <script>
@@ -179,7 +184,6 @@
 
     let idx = 0;
 
-    // stack → line
     setTimeout(() => {
       mark.classList.remove("stack");
       mark.classList.add("line");
